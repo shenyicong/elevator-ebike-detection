@@ -1,0 +1,14 @@
+# Unified 5-class dataset configuration (merged from both source datasets)
+# ds2 "motorcycle" is mapped to "Electric-bicycle" (class 1)
+path: ./datasets/elevator_ebike
+train: images/train
+val: images/val
+test: images/test
+
+nc: 5
+names:
+  0: Baby-carriage
+  1: Electric-bicycle
+  2: bicycle
+  3: person
+  4: wheelchair
