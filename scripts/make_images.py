@@ -37,6 +37,26 @@ def paste_cover(base, im, box, radius=14):
     base.paste(im2, (x, y), mask)
 
 
+def paste_contain(base, im, box, bg=(255, 255, 255)):
+    """把图片等比缩放完整放进 box，不裁切，居中显示，带圆角。"""
+    left, top, right, bottom = box
+    w, h = right - left, bottom - top
+    # 圆角背景
+    panel = Image.new("RGBA", base.size, (0, 0, 0, 0))
+    pd = ImageDraw.Draw(panel)
+    pd.rounded_rectangle([left, top, right, bottom], 20, fill=bg + (255,))
+    base.paste(panel, (0, 0), panel)
+    # 等比缩放到框内（留边距）
+    pad = 12
+    ratio = min((w - 2 * pad) / im.width, (h - 2 * pad) / im.height)
+    nw, nh = max(1, int(im.width * ratio)), max(1, int(im.height * ratio))
+    im2 = im.resize((nw, nh), Image.LANCZOS)
+    px, py = left + (w - nw) // 2, top + (h - nh) // 2
+    mask = Image.new("L", (nw, nh), 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, nw - 1, nh - 1], 10, fill=255)
+    base.paste(im2, (px, py), mask)
+
+
 def make_og():
     """社交预览图 1200x630（Open Graph / Twitter Card）。"""
     W, H = 1200, 630
@@ -92,7 +112,7 @@ def make_banner():
     d = ImageDraw.Draw(img)
 
     # 左侧文字
-    d.rounded_rectangle([64, 60, 500, 108], 24, fill=(29, 78, 216))
+    d.rounded_rectangle([64, 60, 520, 108], 24, fill=(29, 78, 216))
     d.text((88, 69), "SMART SAFETY · COMPUTER VISION", font=font(24), fill=(255, 255, 255))
 
     d.text((60, 140), "电梯内电动车智能检测系统", font=font(66), fill=(15, 23, 42))
@@ -111,7 +131,7 @@ def make_banner():
     # 右侧效果图
     demo = ASSETS / "demo_ds1_02.jpg"
     if demo.exists():
-        paste_cover(img, Image.open(demo).convert("RGB"), (900, 55, 1545, 505), 20)
+        paste_contain(img, Image.open(demo).convert("RGB"), (900, 55, 1545, 505), bg=(232, 238, 250))
 
     out = ASSETS / "banner.png"
     img.save(out, quality=95)
