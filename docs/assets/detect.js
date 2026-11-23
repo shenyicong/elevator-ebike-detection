@@ -9,20 +9,21 @@
  * （从 Ultralytics Platform 模型页 → Export → ONNX 下载后放进来）
  */
 
-// ============ 可配置项 ============
-// 类别名：和你训练模型时的类别顺序必须一致！
-// 数据集1（electric-bicycle-entering-elevator）是下面这 5 类：
-const CLASS_NAMES = [
-  "Baby-carriage",   // 0 婴儿车
-  "Electric-bicycle",// 1 电动车
-  "bicycle",         // 2 自行车
-  "person",          // 3 行人
-  "wheelchair",      // 4 轮椅
-];
-// 如果你用的是数据集2（lift-ebike，只有1类 motorcycle），改成：
-// const CLASS_NAMES = ["motorcycle"];
+// ============ 模型配置 ============
+// 两个模型都用你自己训练的权重导出（从 Ultralytics Platform 下载的 .pt → ONNX）
+const MODELS = {
+  ds1: {
+    path: "assets/models/ds1_elevator.onnx",
+    names: ["Baby-carriage", "Electric-bicycle", "bicycle", "person", "wheelchair"],
+    label: "数据集1 · 5类（电动车/行人/自行车/婴儿车/轮椅）",
+  },
+  ds2: {
+    path: "assets/models/ds2_liftebike.onnx",
+    names: ["motorcycle"],
+    label: "数据集2 · 1类（电梯内电动车）",
+  },
+};
 
-const MODEL_PATH = "assets/models/best.onnx"; // 模型路径
 const IMG_SIZE = 640;        // 模型输入尺寸（导出 ONNX 时的 imgsz）
 const CONF_THRESH = 0.25;    // 置信度阈值：低于此值的框丢弃
 const IOU_THRESH = 0.45;     // NMS 的 IoU 阈值：重叠框合并
@@ -34,9 +35,12 @@ const COLORS = [
 ];
 
 // ============ 全局状态 ============
-let session = null;      // onnxruntime 推理会话（加载一次复用）
-let ortReady = false;    // onnxruntime 库是否已就绪
-let currentImage = null; // 当前图片 Image 对象
+let session = null;          // 当前 onnxruntime 推理会话
+let sessions = {};           // 按模型 key 缓存会话，切换时不重复加载
+let ortReady = false;        // onnxruntime 库是否已就绪
+let currentImage = null;     // 当前图片 Image 对象
+let currentModelKey = "ds1"; // 当前选中的模型
+function classNames() { return MODELS[currentModelKey].names; }
 
 // ============ 加载 onnxruntime-web（从 CDN）============
 async function loadOrt() {
@@ -57,14 +61,16 @@ function loadScript(src) {
 }
 
 // ============ 加载 YOLO 模型 ============
-async function loadModel() {
-  if (session) return session;
+async function loadModel(key) {
+  key = key || currentModelKey;
+  if (sessions[key]) { session = sessions[key]; return session; }
   await loadOrt();
   const opt = {
     executionProviders: ["wasm"],  // 浏览器里用 CPU(wasm) 推理
     graphOptimizationLevel: "all",
   };
-  session = await window.ort.InferenceSession.create(MODEL_PATH, opt);
+  session = await window.ort.InferenceSession.create(MODELS[key].path, opt);
+  sessions[key] = session;
   return session;
 }
 
@@ -181,7 +187,7 @@ function drawBoxes(canvas, img, boxes) {
     ctx.strokeStyle = css;
     ctx.strokeRect(x, y, w, h);
     // 标签框
-    const label = `${CLASS_NAMES[b.cls] || b.cls} ${(b.score * 100).toFixed(0)}%`;
+    const label = `${classNames()[b.cls] || b.cls} ${(b.score * 100).toFixed(0)}%`;
     const tw = ctx.measureText(label).width;
     ctx.fillStyle = css;
     ctx.fillRect(x, Math.max(0, y - 26), tw + 16, 26);
@@ -221,9 +227,8 @@ async function detect(img) {
     console.error(err);
     status.className = "detect-status err";
     status.textContent = "❌ " + (err.message || "检测失败");
-    // 模型未就位时给出明确指引
-    if (String(err).includes("best.onnx") || String(err).toLowerCase().includes("fetch")) {
-      status.innerHTML = "⚠️ 模型文件 best.onnx 尚未放入。<br>请从 Ultralytics Platform → 模型页 → Export → 导出 ONNX，<br>下载后放到 <code>docs/assets/models/best.onnx</code> 并重新部署。";
+    if (String(err).toLowerCase().includes("fetch") || String(err).includes(".onnx")) {
+      status.innerHTML = "⚠️ 模型加载失败，请检查网络后刷新页面重试。";
     }
   }
 }
@@ -235,7 +240,7 @@ function renderResultList(boxes) {
     const color = COLORS[b.cls % COLORS.length];
     return `<div class="detect-item">
       <span class="dot" style="background:rgb(${color.join(',')})"></span>
-      <b>${CLASS_NAMES[b.cls] || b.cls}</b>
+      <b>${classNames()[b.cls] || b.cls}</b>
       <span class="conf">${(b.score * 100).toFixed(1)}%</span>
     </div>`;
   }).join("");
@@ -259,6 +264,20 @@ function initUploader() {
       img.src = btn.getAttribute("data-demo");
     });
   });
+
+  // 模型切换：切换后如果有当前图片就重新检测
+  const sel = document.getElementById("model-select");
+  if (sel) {
+    sel.addEventListener("change", async (e) => {
+      currentModelKey = e.target.value;
+      const status = document.getElementById("detect-status");
+      status.className = "detect-status loading";
+      status.textContent = `⏳ 正在加载 ${MODELS[currentModelKey].label} …`;
+      try { await loadModel(currentModelKey); } catch (err) { console.error(err); }
+      if (currentImage) { detect(currentImage); }
+      else { status.className = "detect-status"; status.textContent = "模型已切换，等待上传图片…"; }
+    });
+  }
 }
 
 function handleFile(file) {

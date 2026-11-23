@@ -113,6 +113,10 @@ td.best{color:var(--blue);font-weight:800}
 /* live demo */
 .demo{background:linear-gradient(160deg,#f8fafc 0%,#eef2ff 100%)}
 .demo-box{display:grid;grid-template-columns:1fr 1.25fr;gap:24px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 8px 30px rgba(15,23,42,.07)}
+.model-pick{margin-bottom:14px}
+.model-pick label{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.model-pick select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;color:var(--ink);background:#fff;cursor:pointer;font-family:inherit}
+.model-pick select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(29,78,216,.12)}
 .detect-drop{border:2px dashed #c7d2fe;border-radius:16px;background:#f8faff;padding:36px 20px;text-align:center;cursor:pointer;transition:.2s}
 .detect-drop:hover,.detect-drop.drag{border-color:var(--blue);background:#eef2ff}
 .detect-drop .cam{font-size:46px;line-height:1}
@@ -181,6 +185,13 @@ footer a{color:#93c5fd}
   <div class="sec-head"><div class="kicker">Live Demo</div><h2>在线体验</h2><p>上传一张电梯照片，浏览器本地运行 YOLO11n 实时检测 — 图片不会上传到服务器</p></div>
   <div class="demo-box">
     <div>
+      <div class="model-pick">
+        <label for="model-select">选择检测模型</label>
+        <select id="model-select">
+          <option value="ds1">模型 1 · 5类（电动车/行人/自行车/婴儿车/轮椅）</option>
+          <option value="ds2">模型 2 · 1类（电梯内电动车 motorcycle）</option>
+        </select>
+      </div>
       <div class="detect-drop" id="detect-drop">
         <div class="cam">📷</div>
         <h3>上传照片开始检测</h3>
