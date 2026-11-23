@@ -251,6 +251,12 @@ function initUploader() {
   const input = document.getElementById("file-input");
   const drop = document.getElementById("detect-drop");
   input.addEventListener("change", (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+  // 点击上传区（含"选择图片"按钮）时打开系统文件选择框
+  drop.addEventListener("click", () => input.click());
+  // input.click() 触发的 click 会冒泡回 drop，必须阻止，否则会递归无限调用
+  input.addEventListener("click", (e) => e.stopPropagation());
+
   ["dragover", "dragenter"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("drag"); }));
   ["dragleave", "drop"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove("drag"); }));
   drop.addEventListener("drop", (e) => { if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
