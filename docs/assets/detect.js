@@ -135,10 +135,19 @@ function iou(a, b) {
 function postprocess(output, meta) {
   const dims = output.dims;              // 例如 [1, 9, 8400]
   const data = output.data;
-  let numAnchors, numAttrs;
-  if (dims[2] < dims[1]) { numAnchors = dims[2]; numAttrs = dims[1]; }
-  else { numAnchors = dims[1]; numAttrs = dims[2]; }
-  const transposed = dims[2] < dims[1]; // 需要转置
+  // Ultralytics ONNX 输出通常为 [1, 4+nc, 8400]（属性在前、anchor 在后）
+  let numAnchors, numAttrs, transposed;
+  if (dims[1] < dims[2]) {
+    // [1, attrs, anchors]：按 data[attr * anchors + anchor] 读取
+    numAttrs = dims[1];
+    numAnchors = dims[2];
+    transposed = true;
+  } else {
+    // [1, anchors, attrs]：按 data[anchor * attrs + attr] 读取
+    numAnchors = dims[1];
+    numAttrs = dims[2];
+    transposed = false;
+  }
   const clsCount = numAttrs - 4;
 
   const boxes = [];
