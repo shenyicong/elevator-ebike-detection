@@ -58,7 +58,7 @@ def paste_contain(base, im, box, bg=(255, 255, 255)):
 
 
 def make_og():
-    """社交预览图 1200x630（Open Graph / Twitter Card）。"""
+    """社交预览图 1200x630（Open Graph / Twitter Card）—— 左文右图布局。"""
     W, H = 1200, 630
     img = linear_gradient((W, H), (13, 27, 62), (26, 58, 120))
     d = ImageDraw.Draw(img)
@@ -72,34 +72,35 @@ def make_og():
     img = Image.alpha_composite(img.convert("RGBA"), glow).convert("RGB")
     d = ImageDraw.Draw(img)
 
+    # ============ 左半区：文字 + 指标 ============
     # 顶部小标签
-    d.rounded_rectangle([56, 48, 300, 88], 20, fill=(30, 64, 130))
-    d.text((76, 57), "YOLO11n  ·  目标检测", font=font(22), fill=(147, 197, 253))
+    d.rounded_rectangle([48, 46, 288, 88], 20, fill=(30, 64, 130))
+    d.text((68, 55), "YOLO11n  ·  目标检测", font=font(22), fill=(147, 197, 253))
 
-    # 主标题
-    d.text((54, 118), "电梯内电动车智能检测系统", font=font(62), fill=(255, 255, 255))
-    d.text((56, 205), "Elevator E-Bicycle Detection · YOLO11n", font=font(28, False), fill=(148, 163, 184))
+    # 主标题（两行，完整不溢出）
+    d.text((46, 118), "电梯内电动车", font=font(60), fill=(255, 255, 255))
+    d.text((46, 196), "智能检测系统", font=font(60), fill=(255, 255, 255))
+    d.text((48, 288), "Elevator E-Bicycle Detection", font=font(24, False), fill=(148, 163, 184))
 
-    # 三个指标卡
+    # 三个指标卡（横排紧凑）
     stats = [("13,992", "训练图像"), ("5", "检测类别"), ("2", "对比实验")]
-    x = 56
+    x = 48
     for val, lab in stats:
-        d.rounded_rectangle([x, 285, x + 250, 380], 16, fill=(255, 255, 255))
-        d.text((x + 22, 297), val, font=font(46), fill=(29, 78, 216))
-        d.text((x + 24, 352), lab, font=font(20, False), fill=(100, 116, 139))
-        x += 272
+        d.rounded_rectangle([x, 355, x + 152, 452], 14, fill=(255, 255, 255))
+        d.text((x + 16, 366), val, font=font(38), fill=(29, 78, 216))
+        d.text((x + 17, 415), lab, font=font(18, False), fill=(100, 116, 139))
+        x += 164
 
-    # 底部：检测效果图拼贴
-    demo = ASSETS / "demo_ds1_01.jpg"
-    if demo.exists():
-        paste_cover(img, Image.open(demo).convert("RGB"), (56, 410, 560, 600), 16)
+    # 底部强调语
+    d.text((48, 500), "高精度  ·  实时检测  ·  电梯安全", font=font(24), fill=(96, 165, 250))
+    d.text((48, 552), "基于 Ultralytics YOLO11n", font=font(19, False), fill=(148, 163, 184))
 
-    demo2 = ASSETS / "demo_ds2_02.jpg"
-    if demo2.exists():
-        paste_cover(img, Image.open(demo2).convert("RGB"), (580, 410, 1084, 600), 16)
+    # ============ 右半区：一整块高亮检测图（完整显示，不裁切）============
+    hero = ASSETS / "hero_detect.png"
+    if hero.exists():
+        paste_contain(img, Image.open(hero).convert("RGB"),
+                      (560, 46, 1160, 590), bg=(255, 255, 255))
 
-    d = ImageDraw.Draw(img)
-    d.text((56, 604 - 0), "", font=font(10))  # noqa
     out = ASSETS / "og-image.png"
     img.save(out, quality=95)
     print("saved", out, img.size)
