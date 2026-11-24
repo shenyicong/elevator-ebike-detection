@@ -48,13 +48,19 @@ Combining two public datasets (**13,992 images** in total), the project runs com
 
 ## 📊 Results
 
-Trained on Ultralytics Platform cloud GPU (100 epochs, imgsz=640). Fill in metrics after training (`train.py` generates `training_summary.csv` automatically).
+Trained on Ultralytics Platform cloud GPU (RTX PRO 6000, imgsz=640). The merged model `elevator-ebike-merged` has finished training and validation:
 
 | Exp | Dataset | Classes | Images | mAP50 | mAP50-95 | P | R |
 |:---|:---|:---:|:---:|:---:|:---:|:---:|:---:|
 | Exp 1 | electric-bicycle-entering-elevator | 5 | 8,193 | — | — | — | — |
 | Exp 2 | lift-ebike | 1 | 5,799 | — | — | — | — |
-| Exp 3 | Merged | 5 | 13,992 | — | — | — | — |
+| **Exp 3** ⭐ | **Merged** | **5** | **13,992** | **89.5%** | **73.5%** | **93.4%** | **82.3%** |
+
+> 🏆 **Best model**: Exp 3 trained on the merged dataset reaches **89.5% mAP50** and **93.4% precision**. Exported to ONNX and served in the [live demo](https://shenyicong.github.io/elevator-ebike-detection/) (Model 3).
+>
+> Training details: Ultralytics 8.4.218 · RTX PRO 6000 · 21 min runtime · $0.90 compute cost · ~14K images.
+>
+> 💡 Metrics for the single-dataset models (Exp 1/2) were not saved; copy them from the Results tab on Ultralytics Platform.
 
 ## 🗂️ Datasets
 

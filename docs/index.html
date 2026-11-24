@@ -174,7 +174,7 @@ footer a{color:#93c5fd}
     <p class="desc">基于 YOLO11n 深度学习模型，自动识别电梯轿厢内的电动车、自行车、婴儿车、行人与轮椅，为电动车违规入梯监管提供实时、精准的视觉感知能力。</p>
     <div class="tags">
       <span>🧠 YOLO11n</span><span>📊 13,992 图像</span><span>🎯 5 类目标</span>
-      <span>⚡ 实时推理</span><span>☁️ Ultralytics Platform</span><span>📄 CC BY 4.0</span>
+      <span>🏆 mAP50 89.5%</span><span>⚡ 实时推理</span><span>☁️ Ultralytics Platform</span><span>📄 CC BY 4.0</span>
     </div>
   </div>
   <div class="hero-img"><img src="assets/hero_detect.png" alt="电动车检测效果"></div>
@@ -188,6 +188,7 @@ footer a{color:#93c5fd}
       <div class="model-pick">
         <label for="model-select">选择检测模型</label>
         <select id="model-select">
+          <option value="ds3">模型 3 · 合并集5类（mAP50 89.5%，推荐）</option>
           <option value="ds1">模型 1 · 5类（电动车/行人/自行车/婴儿车/轮椅）</option>
           <option value="ds2">模型 2 · 1类（电梯内电动车 motorcycle）</option>
         </select>
@@ -219,8 +220,8 @@ footer a{color:#93c5fd}
 <div class="stats"><div class="wrap">
   <div class="stat"><div class="n">13,992</div><div class="l">训练图像总数</div></div>
   <div class="stat"><div class="n">5</div><div class="l">检测类别</div></div>
-  <div class="stat"><div class="n">22,336</div><div class="l">标注框总数</div></div>
-  <div class="stat"><div class="n">2</div><div class="l">对比实验</div></div>
+  <div class="stat"><div class="n">89.5%</div><div class="l">最佳 mAP50</div></div>
+  <div class="stat"><div class="n">3</div><div class="l">训练模型</div></div>
 </div></div>
 
 <section id="overview"><div class="wrap">
@@ -279,12 +280,12 @@ footer a{color:#93c5fd}
   <div class="tbl-wrap"><table>
     <thead><tr><th>实验</th><th>数据集</th><th>类别数</th><th>图像数</th><th>mAP50</th><th>mAP50-95</th><th>P</th><th>R</th></tr></thead>
     <tbody>
-      <tr><td><b>Exp 1</b></td><td>electric-bicycle-entering-elevator</td><td>5</td><td>8,193</td><td class="best">—</td><td>—</td><td>—</td><td>—</td></tr>
-      <tr><td><b>Exp 2</b></td><td>lift-ebike</td><td>1</td><td>5,799</td><td class="best">—</td><td>—</td><td>—</td><td>—</td></tr>
-      <tr><td><b>Exp 3</b></td><td>合并数据集</td><td>5</td><td>13,992</td><td class="best">—</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr><td><b>Exp 1</b></td><td>electric-bicycle-entering-elevator</td><td>5</td><td>8,193</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr><td><b>Exp 2</b></td><td>lift-ebike</td><td>1</td><td>5,799</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr style="background:#eff6ff"><td><b>Exp 3</b> 🏆</td><td><b>合并数据集</b></td><td>5</td><td>13,992</td><td class="best">89.5%</td><td class="best">73.5%</td><td class="best">93.4%</td><td class="best">82.3%</td></tr>
     </tbody>
   </table></div>
-  <p class="note">💡 指标待填入：训练完成后在 Ultralytics Platform 模型详情页的 Results / Metrics 中查看 mAP50、mAP50-95、Precision、Recall。</p>
+  <p class="note">🏆 最佳模型：合并数据集训练的 YOLO11n，mAP50 达 89.5% · RTX PRO 6000 云端训练 21 分钟 · Ultralytics 8.4.218。Exp 1/2 的单集模型指标未在平台保存。</p>
 </div></section>
 
 <section id="gallery"><div class="wrap">

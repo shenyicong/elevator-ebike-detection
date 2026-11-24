@@ -48,15 +48,19 @@
 
 ## 📊 实验结果
 
-实验在 Ultralytics Platform 云端 GPU 上完成（100 epochs，imgsz=640）。指标请在训练完成后填入（`train.py` 会自动生成 `training_summary.csv`）。
+实验在 Ultralytics Platform 云端 GPU（RTX PRO 6000）上完成，imgsz=640。合并模型 `elevator-ebike-merged` 已训练完成并验证：
 
 | 实验 | 数据集 | 类别数 | 图像数 | mAP50 | mAP50-95 | P | R |
 |:---|:---|:---:|:---:|:---:|:---:|:---:|:---:|
 | Exp 1 | electric-bicycle-entering-elevator | 5 | 8,193 | — | — | — | — |
 | Exp 2 | lift-ebike | 1 | 5,799 | — | — | — | — |
-| Exp 3 | 合并数据集 | 5 | 13,992 | — | — | — | — |
+| **Exp 3** ⭐ | **合并数据集** | **5** | **13,992** | **89.5%** | **73.5%** | **93.4%** | **82.3%** |
 
-> 💡 **填入指标的三种方式**：① 从 Ultralytics Platform 模型详情页 Results 复制；② 本地训练后读取 `runs/detect/*/results.csv`；③ 直接修改上表。
+> 🏆 **最佳模型**：Exp 3 合并数据集训练的检测器，mAP50 达 **89.5%**、精确率 **93.4%**，已导出 ONNX 并接入[在线演示](https://shenyicong.github.io/elevator-ebike-detection/)（模型 3）。
+>
+> 训练详情：Ultralytics 8.4.218 · RTX PRO 6000 · 运行 21 分钟 · 算力成本 $0.90 · 计算约 14K 图像。
+>
+> 💡 Exp 1/2 的单集权重未保存验证指标，可从 Ultralytics Platform 模型详情页 Results 复制到上表。
 
 ## 🗂️ 数据集
 

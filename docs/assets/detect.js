@@ -12,15 +12,20 @@
 // ============ 模型配置 ============
 // 两个模型都用你自己训练的权重导出（从 Ultralytics Platform 下载的 .pt → ONNX）
 const MODELS = {
+  ds3: {
+    path: "assets/models/ds3_merged.onnx",
+    names: ["Baby-carriage", "Electric-bicycle", "bicycle", "person", "wheelchair"],
+    label: "模型3 · 合并集5类（mAP50 89.5%，推荐）",
+  },
   ds1: {
     path: "assets/models/ds1_elevator.onnx",
     names: ["Baby-carriage", "Electric-bicycle", "bicycle", "person", "wheelchair"],
-    label: "数据集1 · 5类（电动车/行人/自行车/婴儿车/轮椅）",
+    label: "模型1 · 数据集1的5类",
   },
   ds2: {
     path: "assets/models/ds2_liftebike.onnx",
     names: ["motorcycle"],
-    label: "数据集2 · 1类（电梯内电动车）",
+    label: "模型2 · 数据集2的1类（电梯内电动车）",
   },
 };
 
@@ -39,7 +44,7 @@ let session = null;          // 当前 onnxruntime 推理会话
 let sessions = {};           // 按模型 key 缓存会话，切换时不重复加载
 let ortReady = false;        // onnxruntime 库是否已就绪
 let currentImage = null;     // 当前图片 Image 对象
-let currentModelKey = "ds1"; // 当前选中的模型
+let currentModelKey = "ds3"; // 当前选中的模型（默认最佳：合并集）
 function classNames() { return MODELS[currentModelKey].names; }
 
 // ============ 加载 onnxruntime-web（从 CDN）============
