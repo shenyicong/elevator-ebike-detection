@@ -64,8 +64,15 @@ function classNames() { return MODELS[currentModelKey].names; }
  * - 不支持则加载 ort.min.js（CPU WASM，慢但通用）
  * wasmPaths 在两种情况下都指向 CDN 目录，WebGPU 会自动加载 .jsep.wasm。
  */
+let ortLoadingPromise = null; // 去重：预热与点击可能并发，共用同一次加载
 async function loadOrt(onProgress) {
   if (window.ort) { ortReady = true; return; }
+  if (ortLoadingPromise) {
+    // 已有加载在进行中，复用它，避免重复注入 script 导致相互超时
+    try { await ortLoadingPromise; } catch (e) { /* 由发起方处理 */ }
+    if (window.ort) { ortReady = true; return; }
+  }
+  ortLoadingPromise = (async () => {
   // 真正探测 GPU adapter：有些浏览器有 navigator.gpu 但拿不到适配器
   let hasWebGpu = false;
   try {
@@ -82,7 +89,7 @@ async function loadOrt(onProgress) {
   for (const base of ORT_SOURCES) {
     try {
       if (onProgress) onProgress(`⏳ 正在加载检测引擎（${base.startsWith("assets") ? "本地" : "备用源"}）…`);
-      await loadScript(base + file, 8000);
+      await loadScript(base + file, 15000);
       ortBase = base;                    // 记住成功的来源，wasm 从同一处取
       useWebGpu = hasWebGpu;
       break;
@@ -100,10 +107,12 @@ async function loadOrt(onProgress) {
   // "Failed to resolve module specifier"，必须给完整地址。CDN 源本身已是绝对地址。
   window.ort.env.wasm.wasmPaths = new URL(ortBase, window.location.href).href;
   ortReady = true;
+  })();
+  try { await ortLoadingPromise; } finally { ortLoadingPromise = null; }
 }
 
 /** 带超时的 script 加载：超时后移除节点，交给下一个来源重试 */
-function loadScript(src, timeoutMs = 8000) {
+function loadScript(src, timeoutMs = 15000) {
   return new Promise((resolve, reject) => {
     const s = document.createElement("script");
     let settled = false;
