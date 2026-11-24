@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>微信推文 · 炫酷排版版</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 28px 12px 60px;
+    background: radial-gradient(1200px 600px at 50% -10%, #16224a 0%, #060911 60%);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .phone {
+    max-width: 677px; margin: 0 auto; overflow: hidden;
+    background: #0c1120;
+    border: 1px solid rgba(120,160,255,.18);
+    border-radius: 20px;
+    box-shadow: 0 30px 90px rgba(0,0,0,.65), 0 0 0 1px rgba(34,211,238,.05) inset;
+  }
+  .reveal { animation: rise .7s cubic-bezier(.2,.7,.2,1) both; }
+  @keyframes rise { from { opacity:0; transform:translateY(18px);} to {opacity:1; transform:none;} }
+  .glow { text-shadow: 0 0 24px rgba(34,211,238,.45); }
+  ::selection { background: #22d3ee; color: #04121a; }
+</style>
+</head>
+<body>
+<div class="phone">
+
+<!-- ============ 封面 ============ -->
+<section style="position:relative; padding:66px 34px 54px; background:
+    radial-gradient(600px 260px at 80% 0%, rgba(167,139,250,.22), transparent 70%),
+    radial-gradient(500px 240px at 10% 90%, rgba(34,211,238,.18), transparent 70%),
+    linear-gradient(160deg,#0e1630 0%,#0a0f1e 100%);
+    border-bottom:1px solid rgba(120,160,255,.15);">
+  <div class="reveal" style="display:inline-block; font-size:11px; letter-spacing:3px; font-weight:700;
+       color:#22d3ee; border:1px solid rgba(34,211,238,.4); border-radius:999px;
+       padding:6px 14px; margin-bottom:26px;">
+    DEEP DIVE &nbsp;/&nbsp; YOLO11n &nbsp;/&nbsp; 2026
+  </div>
+  <h1 class="reveal glow" style="margin:0 0 18px; font-size:34px; line-height:1.35; font-weight:800;
+      color:#f2f6ff; letter-spacing:.5px;">
+    一辆闯进电梯的电动车<br>
+    <span style="background:linear-gradient(90deg,#22d3ee 0%,#a78bfa 55%,#f472b6 100%);
+      -webkit-background-clip:text; background-clip:text; color:#a78bfa;">
+      和一场 45 倍的性能追击
+    </span>
+  </h1>
+  <p class="reveal" style="margin:0; font-size:15px; line-height:1.9; color:#9fb0cc; font-weight:400;">
+    一个 YOLO11n 检测系统，从 1.4 万张图到纯网页实时识别，再到把 2fps 拉到 98fps 的完整实战。
+  </p>
+  <div style="margin-top:30px; display:flex; gap:9px; flex-wrap:wrap;">
+    <span style="font-size:11px; color:#7fe3d6; background:rgba(34,211,238,.09); border:1px solid rgba(34,211,238,.28); padding:5px 11px; border-radius:6px;">13,992 张图</span>
+    <span style="font-size:11px; color:#c4b5fd; background:rgba(167,139,250,.09); border:1px solid rgba(167,139,250,.28); padding:5px 11px; border-radius:6px;">mAP50 89.5%</span>
+    <span style="font-size:11px; color:#f9a8d4; background:rgba(244,114,182,.09); border:1px solid rgba(244,114,182,.28); padding:5px 11px; border-radius:6px;">2 → 98 fps</span>
+  </div>
+  <div style="position:absolute; right:26px; top:26px; width:70px; height:70px; border-radius:50%;
+      border:1px solid rgba(34,211,238,.18); box-shadow:0 0 0 12px rgba(34,211,238,.04), 0 0 0 26px rgba(167,139,250,.03);"></div>
+</section>
+
+<!-- ============ 正文容器 ============ -->
+<div style="padding:14px 30px 44px; color:#dbe4f3; font-size:15px; line-height:2.0;">
+
+  <!-- 写在前面 -->
+  <section class="reveal" style="margin:26px 0 40px; padding:22px 22px 18px; border-radius:14px;
+      background:linear-gradient(135deg,rgba(34,211,238,.07),rgba(167,139,250,.05));
+      border:1px solid rgba(120,160,255,.18); border-left:3px solid #22d3ee;">
+    <div style="font-size:12px; font-weight:700; color:#22d3ee; letter-spacing:2px; margin-bottom:12px;">写在前面</div>
+    <p style="margin:0 0 14px;">
+      你大概见过这样的画面：狭小的电梯轿厢里，一辆电动车硬挤进来，车把蹭着轿壁，电池离人只有几十厘米。
+    </p>
+    <p style="margin:0 0 14px;">
+      这不是小事。电动车进电梯后起火，从冒烟到爆燃往往只有几秒，而轿厢是一个几乎密闭的铁皮盒子。
+    </p>
+    <p style="margin:0;">
+      "禁止电动车进电梯"贴了很多年，靠的却是自觉和物业盯梢。人盯屏幕会累，会漏，会走神。<strong style="color:#f2f6ff;">那么问题来了：能不能让机器替人盯住这一眼？</strong>
+    </p>
+  </section>
+
+  <!-- 01 -->
+  <section class="reveal" style="margin-bottom:44px;">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
+      <span style="flex:none; width:38px; height:38px; border-radius:11px; display:grid; place-items:center;
+        font-size:15px; font-weight:800; color:#05131c;
+        background:linear-gradient(135deg,#22d3ee,#38bdf8); box-shadow:0 6px 22px rgba(34,211,238,.35);">01</span>
+      <h2 style="margin:0; font-size:21px; font-weight:800; color:#f2f6ff; letter-spacing:.5px;">起点：不是一个模型，而是一双"能看见"的眼睛</h2>
+    </div>
+    <p style="margin:0 0 16px;">
+      项目叫<strong style="color:#7dd3fc;">电梯内电动车智能检测系统</strong>。听起来像论文题目，其实要做的事很朴素——让摄像头看懂电梯里发生了什么：有没有电动车、自行车、婴儿车，有没有人，有没有轮椅。
+    </p>
+    <p style="margin:0 0 16px;">技术选型落在 <strong style="color:#c4b5fd;">YOLO11n</strong> 上，理由有三：</p>
+    <div style="margin:0 0 18px; display:grid; gap:10px;">
+      <div style="padding:12px 16px; border-radius:10px; background:rgba(255,255,255,.035); border:1px solid rgba(120,160,255,.12);"><strong style="color:#22d3ee;">够轻</strong> &nbsp;n 是 nano，小到能塞进边缘设备，不用依赖云端</div>
+      <div style="padding:12px 16px; border-radius:10px; background:rgba(255,255,255,.035); border:1px solid rgba(120,160,255,.12);"><strong style="color:#a78bfa;">够快</strong> &nbsp;一次前向框出画面里所有目标，天然适合实时场景</div>
+      <div style="padding:12px 16px; border-radius:10px; background:rgba(255,255,255,.035); border:1px solid rgba(120,160,255,.12);"><strong style="color:#f472b6;">够准</strong> &nbsp;新一代 YOLO11 在小目标、密集场景上更稳</div>
+    </div>
+    <p style="margin:0; color:#9fb0cc;">但要真正落地，第一道坎是数据。</p>
+  </section>
+
+  <!-- 02 -->
+  <section class="reveal" style="margin-bottom:44px;">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
+      <span style="flex:none; width:38px; height:38px; border-radius:11px; display:grid; place-items:center;
+        font-size:15px; font-weight:800; color:#05131c;
+        background:linear-gradient(135deg,#a78bfa,#c084fc); box-shadow:0 6px 22px rgba(167,139,250,.35);">02</span>
+      <h2 style="margin:0; font-size:21px; font-weight:800; color:#f2f6ff; letter-spacing:.5px;">数据：1.4 万张图，和一场"语义对齐"的暗战</h2>
+    </div>
+    <table style="width:100%; border-collapse:separate; border-spacing:0; margin:0 0 20px; border-radius:12px; overflow:hidden;
+        background:#111a2e; border:1px solid rgba(120,160,255,.18); font-size:13.5px;">
+      <tr>
+        <th style="text-align:left; padding:12px 14px; background:linear-gradient(90deg,rgba(34,211,238,.16),rgba(167,139,250,.16)); color:#e8f4ff; font-weight:700;">数据集</th>
+        <th style="text-align:right; padding:12px 12px; background:linear-gradient(90deg,rgba(34,211,238,.16),rgba(167,139,250,.16)); color:#e8f4ff; font-weight:700;">图像</th>
+        <th style="text-align:right; padding:12px 14px; background:linear-gradient(90deg,rgba(34,211,238,.16),rgba(167,139,250,.16)); color:#e8f4ff; font-weight:700;">标注框</th>
+      </tr>
+      <tr>
+        <td style="padding:12px 14px; color:#c7d4e8; border-top:1px solid rgba(120,160,255,.1);">electric-bicycle-entering-elevator</td>
+        <td style="padding:12px 12px; text-align:right; color:#22d3ee; font-weight:700; border-top:1px solid rgba(120,160,255,.1);">8,193</td>
+        <td style="padding:12px 14px; text-align:right; color:#c7d4e8; border-top:1px solid rgba(120,160,255,.1);">16,455</td>
+      </tr>
+      <tr>
+        <td style="padding:12px 14px; color:#c7d4e8; border-top:1px solid rgba(120,160,255,.1);">lift-ebike</td>
+        <td style="padding:12px 12px; text-align:right; color:#a78bfa; font-weight:700; border-top:1px solid rgba(120,160,255,.1);">5,799</td>
+        <td style="padding:12px 14px; text-align:right; color:#c7d4e8; border-top:1px solid rgba(120,160,255,.1);">5,881</td>
+      </tr>
+    </table>
+    <p style="margin:0 0 16px;">
+      合起来是 <strong style="color:#22d3ee;">13,992 张图像、22,336 个标注框</strong>，统一成 5 类：电动车、自行车、婴儿车、行人、轮椅。第二个数据集还多一个 test 集，正好留作跨域验证的试金石。
+    </p>
+    <p style="margin:0 0 16px;">
+      真正棘手的问题藏在类别里：<strong style="color:#f9a8d4;">第二个数据集只有 <code style="background:rgba(244,114,182,.12); padding:2px 6px; border-radius:4px; color:#f9a8d4;">motorcycle</code> 一类，没有"电动车"这个概念。</strong> 是把它映射成统一的 <code style="background:rgba(34,211,238,.12); padding:2px 6px; border-radius:4px; color:#7fe3d6;">Electric-bicycle</code>，还是保留成独立第 6 类？映射错了会引入语义漂移，保留错了两类会互相混淆。
+    </p>
+    <p style="margin:0; color:#9fb0cc;">
+      我的做法是把它当成一个可证伪的问题：固定模型、轮次、尺寸、种子，只改标签体系，跑 A/B 对照。因为"我觉得"不算数，"测出来"才算数。
+    </p>
+    <blockquote style="margin:22px 0 0; padding:14px 18px; background:linear-gradient(90deg,rgba(167,139,250,.12),transparent); border-left:3px solid #a78bfa; border-radius:0 8px 8px 0; color:#c9b8ff; font-size:14px; line-height:1.9;">
+      "数据的脏活，往往不在清洗，而在两个数据集对同一个词的理解不一样。"
+    </blockquote>
+  </section>
+
+  <!-- 03 -->
+  <section class="reveal" style="margin-bottom:44px;">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
+      <span style="flex:none; width:38px; height:38px; border-radius:11px; display:grid; place-items:center;
+        font-size:15px; font-weight:800; color:#05131c;
+        background:linear-gradient(135deg,#f472b6,#fb7185); box-shadow:0 6px 22px rgba(244,114,182,.35);">03</span>
+      <h2 style="margin:0; font-size:21px; font-weight:800; color:#f2f6ff; letter-spacing:.5px;">训练：21 分钟，0.9 美元</h2>
+    </div>
+    <p style="margin:0 0 22px;">训练放在 Ultralytics Platform 云端 GPU 上，用的是 RTX PRO 6000。</p>
+    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:20px;">
+      <div style="padding:18px; border-radius:12px; text-align:center; background:linear-gradient(145deg,rgba(34,211,238,.12),rgba(34,211,238,.03)); border:1px solid rgba(34,211,238,.28); box-shadow:0 0 28px rgba(34,211,238,.08) inset;">
+        <div style="font-size:27px; font-weight:800; color:#67e8f9; line-height:1.2;">21<span style="font-size:14px; color:#9fb0cc; font-weight:500;"> 分钟</span></div>
+        <div style="font-size:12px; color:#7f93b0; margin-top:6px;">训练耗时</div>
+      </div>
+      <div style="padding:18px; border-radius:12px; text-align:center; background:linear-gradient(145deg,rgba(167,139,250,.12),rgba(167,139,250,.03)); border:1px solid rgba(167,139,250,.28); box-shadow:0 0 28px rgba(167,139,250,.08) inset;">
+        <div style="font-size:27px; font-weight:800; color:#c4b5fd; line-height:1.2;">$0.9<span style="font-size:14px; color:#9fb0cc; font-weight:500;"></span></div>
+        <div style="font-size:12px; color:#7f93b0; margin-top:6px;">算力成本</div>
+      </div>
+    </div>
+    <p style="margin:0; color:#9fb0cc;">
+      不到一块美金的算力，换出一个能用的检测器。今天的云端训练，已经把过去"得有张显卡"的门槛抹平了。
+    </p>
+  </section>
+
+  <!-- 04 -->
+  <section class="reveal" style="margin-bottom:44px;">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
+      <span style="flex:none; width:38px; height:38px; border-radius:11px; display:grid; place-items:center;
+        font-size:15px; font-weight:800; color:#05131c;
+        background:linear-gradient(135deg,#fbbf24,#f59e0b); box-shadow:0 6px 22px rgba(251,191,36,.35);">04</span>
+      <h2 style="margin:0; font-size:21px; font-weight:800; color:#f2f6ff; letter-spacing:.5px;">成绩单：89.5% 到底意味着什么</h2>
+    </div>
+    <div style="border-radius:14px; overflow:hidden; border:1px solid rgba(120,160,255,.18); background:#111a2e; margin-bottom:20px;">
+      <div style="display:grid; grid-template-columns:1.1fr 1fr 2fr; font-size:12px; color:#8ea3c0; padding:11px 16px; background:rgba(255,255,255,.04); font-weight:700;">
+        <span>指标</span><span style="text-align:center;">数值</span><span style="text-align:right;">一句话</span>
+      </div>
+      <div style="display:grid; grid-template-columns:1.1fr 1fr 2fr; align-items:center; padding:14px 16px; border-top:1px solid rgba(120,160,255,.1); font-size:13.5px;">
+        <span style="color:#f2f6ff; font-weight:700;">mAP50</span>
+        <span style="text-align:center; font-size:20px; font-weight:800; color:#67e8f9; text-shadow:0 0 18px rgba(34,211,238,.4);">89.5%</span>
+        <span style="text-align:right; color:#a8b8d0; font-size:12px;">宽松标准下的综合准确率</span>
+      </div>
+      <div style="display:grid; grid-template-columns:1.1fr 1fr 2fr; align-items:center; padding:14px 16px; border-top:1px solid rgba(120,160,255,.1); font-size:13.5px;">
+        <span style="color:#f2f6ff; font-weight:700;">mAP50-95</span>
+        <span style="text-align:center; font-size:20px; font-weight:800; color:#c4b5fd;">73.5%</span>
+        <span style="text-align:right; color:#a8b8d0; font-size:12px;">严格标准下，框还不够贴边</span>
+      </div>
+      <div style="display:grid; grid-template-columns:1.1fr 1fr 2fr; align-items:center; padding:14px 16px; border-top:1px solid rgba(120,160,255,.1); font-size:13.5px;">
+        <span style="color:#f2f6ff; font-weight:700;">精确率 P</span>
+        <span style="text-align:center; font-size:20px; font-weight:800; color:#f9a8d4;">93.4%</span>
+        <span style="text-align:right; color:#a8b8d0; font-size:12px;">报出来的框里真目标的比例</span>
+      </div>
+      <div style="display:grid; grid-template-columns:1.1fr 1fr 2fr; align-items:center; padding:14px 16px; border-top:1px solid rgba(120,160,255,.1); font-size:13.5px;">
+        <span style="color:#f2f6ff; font-weight:700;">召回率 R</span>
+        <span style="text-align:center; font-size:20px; font-weight:800; color:#6ee7b7;">82.3%</span>
+        <span style="text-align:right; color:#a8b8d0; font-size:12px;">所有真目标里被找到的比例</span>
+      </div>
+    </div>
+    <p style="margin:0 0 16px;">
+      <strong style="color:#67e8f9;">mAP50 和 mAP50-95 差了 16 个点</strong>，说明框的位置大体正确，但离严丝合缝还有距离——这是后续可以用更精细标注、更大尺寸去补的空间。
+    </p>
+    <p style="margin:0; color:#9fb0cc;">
+      更有意思的是 <strong style="color:#f9a8d4;">P（93.4%）高于 R（82.3%）</strong>：模型偏谨慎，报出来的基本都是真的，但仍有约 18% 的目标没找到。对电梯安全来说这是合理的起点——误报多了，人就会把它当闹钟关掉。想要更多召回，调低置信度阈值即可，这是个可按需调节的旋钮。
+    </p>
+    <blockquote style="margin:22px 0 0; padding:14px 18px; background:linear-gradient(90deg,rgba(251,191,36,.12),transparent); border-left:3px solid #fbbf24; border-radius:0 8px 8px 0; color:#fcd9a0; font-size:14px; line-height:1.9;">
+      "一个模型的性格，藏在 P 和 R 的差值里。"
+    </blockquote>
+  </section>
+
+  <!-- 05 -->
+  <section class="reveal" style="margin-bottom:44px;">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
+      <span style="flex:none; width:38px; height:38px; border-radius:11px; display:grid; place-items:center;
+        font-size:15px; font-weight:800; color:#05131c;
+        background:linear-gradient(135deg,#34d399,#10b981); box-shadow:0 6px 22px rgba(52,211,153,.35);">05</span>
+      <h2 style="margin:0; font-size:21px; font-weight:800; color:#f2f6ff; letter-spacing:.5px;">让指标变成手感：上传一张图就能测</h2>
+    </div>
+    <p style="margin:0 0 18px;">
+      数字再漂亮，也得能亲手试。我把<strong style="color:#7dd3fc;">三个模型</strong>（两个单集模型 + 合并模型）导出成 ONNX，做成了一个纯前端在线演示：打开网页，上传一张电梯照片，浏览器里直接跑推理，检测框画在图上。
+    </p>
+    <p style="margin:0 0 18px;">
+      关键在于——<strong style="color:#6ee7b7;">图片不上传服务器，全部在本地浏览器里算</strong>，用的是 ONNX Runtime Web + WASM，只要有浏览器就能用。合并模型（mAP50 89.5%）被设为默认推荐。
+    </p>
+    <div style="padding:20px; border-radius:14px; text-align:center; margin-bottom:8px;
+        background:radial-gradient(300px 120px at 50% 0%,rgba(52,211,153,.16),transparent),#101a2a;
+        border:1px solid rgba(52,211,153,.3); box-shadow:0 0 34px rgba(52,211,153,.08) inset;">
+      <div style="font-size:12px; color:#7f93b0; margin-bottom:8px; letter-spacing:2px;">ONLINE DEMO</div>
+      <div style="font-size:15px; color:#a7f3d0; font-weight:700; word-break:break-all;">shenyicong.github.io/elevator-ebike-detection</div>
+      <div style="display:inline-block; margin-top:14px; padding:9px 22px; border-radius:999px; font-size:13px; font-weight:700; color:#04150f;
+        background:linear-gradient(90deg,#34d399,#22d3ee); box-shadow:0 8px 24px rgba(52,211,153,.3);">点开就能测</div>
+    </div>
+    <p style="text-align:center; font-size:12px; color:#5f7390; margin:0;">↑ 建议在此处插入带检测框的演示截图 / 操作录屏 GIF</p>
+  </section>
+
+  <!-- 06 高潮 -->
+  <section class="reveal" style="margin-bottom:44px;">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
+      <span style="flex:none; width:38px; height:38px; border-radius:11px; display:grid; place-items:center;
+        font-size:15px; font-weight:800; color:#fff;
+        background:linear-gradient(135deg,#f43f5e,#f97316); box-shadow:0 6px 24px rgba(244,63,94,.45);">06</span>
+      <h2 style="margin:0; font-size:21px; font-weight:800; color:#f2f6ff; letter-spacing:.5px;">高潮：从 2fps 到 98fps，慢的到底是谁</h2>
+    </div>
+    <p style="margin:0 0 20px;">
+      真正刺激的部分，是在网页做完之后。我的电脑是 Intel i5-11320H（4 核 8 线程，带 Iris Xe 核显）。一上手就发现：网页里检测一张图，慢得让人着急。于是做了一轮完整的后端实测（640×640，单张耗时中位数）：
+    </p>
+
+    <div style="display:grid; gap:9px; margin-bottom:24px;">
+      <div style="display:flex; align-items:center; gap:12px; padding:14px 16px; border-radius:10px; background:#141c2f; border:1px solid rgba(120,160,255,.12);">
+        <span style="flex:none; width:8px; height:8px; border-radius:50%; background:#64748b; box-shadow:0 0 10px #64748b;"></span>
+        <span style="flex:1; color:#b8c6da; font-size:13px;">网页 WASM 单线程 <span style="color:#5f7390;">（现状）</span></span>
+        <span style="color:#94a3b8; font-size:13px; width:70px; text-align:right;">464 ms</span>
+        <span style="color:#64748b; font-size:12px; width:46px; text-align:right;">1×</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px; padding:14px 16px; border-radius:10px; background:#141c2f; border:1px solid rgba(120,160,255,.12);">
+        <span style="flex:none; width:8px; height:8px; border-radius:50%; background:#22d3ee; box-shadow:0 0 10px #22d3ee;"></span>
+        <span style="flex:1; color:#b8c6da; font-size:13px;">ONNX Runtime CPU <span style="color:#5f7390;">（原生 8 线程）</span></span>
+        <span style="color:#67e8f9; font-size:13px; width:70px; text-align:right;">34 ms</span>
+        <span style="color:#22d3ee; font-size:12px; width:46px; text-align:right;">13×</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px; padding:14px 16px; border-radius:10px; background:#141c2f; border:1px solid rgba(120,160,255,.12);">
+        <span style="flex:none; width:8px; height:8px; border-radius:50%; background:#a78bfa; box-shadow:0 0 10px #a78bfa;"></span>
+        <span style="flex:1; color:#b8c6da; font-size:13px;">OpenVINO CPU</span>
+        <span style="color:#c4b5fd; font-size:13px; width:70px; text-align:right;">58 ms</span>
+        <span style="color:#a78bfa; font-size:12px; width:46px; text-align:right;">8×</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px; padding:16px; border-radius:10px;
+        background:linear-gradient(90deg,rgba(244,63,94,.16),rgba(249,115,22,.08)); border:1px solid rgba(244,63,94,.4);
+        box-shadow:0 0 30px rgba(244,63,94,.1) inset;">
+        <span style="flex:none; width:9px; height:9px; border-radius:50%; background:#fb7185; box-shadow:0 0 14px #fb7185;"></span>
+        <span style="flex:1; color:#ffe4e6; font-size:13.5px; font-weight:700;">OpenVINO 核显 Iris Xe</span>
+        <span style="color:#fda4af; font-size:15px; font-weight:800; width:70px; text-align:right;">10.2 ms</span>
+        <span style="color:#fb7185; font-size:14px; font-weight:800; width:46px; text-align:right;">45×</span>
+      </div>
+    </div>
+
+    <p style="margin:0 0 16px;">
+      <strong style="color:#fda4af;">第一，慢的不是模型，是浏览器。</strong> 同一个模型原生跑只要 34ms，网页 WASM 单线程却要 464ms，慢了 13 倍。所谓"电脑慢"，其实是"网页这套运行方式慢"。
+    </p>
+    <p style="margin:0 0 20px;">
+      <strong style="color:#c4b5fd;">第二，OpenVINO 的 CPU 反而比 ONNX Runtime CPU 慢</strong>（58ms vs 34ms）。这颗 4 核 CPU 上 OpenVINO 的 CPU 插件并不占优；它的强项是核显——iGPU 只要 10ms，比原生 CPU 还快 3 倍多。
+    </p>
+    <blockquote style="margin:0 0 22px; padding:14px 18px; background:linear-gradient(90deg,rgba(244,63,94,.14),transparent); border-left:3px solid #f43f5e; border-radius:0 8px 8px 0; color:#fecdd3; font-size:14px; line-height:1.9;">
+      "找瓶颈这件事，靠猜永远猜不中，只能一个个测过去。"
+    </blockquote>
+    <p style="margin:0; color:#9fb0cc;">
+      不过有个绕不开的现实：OpenVINO 是本地原生运行时，塞不进 GitHub Pages 这种纯静态网页。要让在线页真正快起来，两条路——<strong style="color:#7dd3fc;">网页 WebGPU 后端</strong>（仍是纯前端、图片不上传，最接近 98fps），或<strong style="color:#c4b5fd;">本地推理服务</strong>（电脑跑 OpenVINO，网页把图传给本机的它）。这也是项目下一步的重点。
+    </p>
+  </section>
+
+  <!-- 07 结尾 -->
+  <section class="reveal" style="margin-bottom:20px;">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
+      <span style="flex:none; width:38px; height:38px; border-radius:11px; display:grid; place-items:center;
+        font-size:15px; font-weight:800; color:#05131c;
+        background:linear-gradient(135deg,#22d3ee,#a78bfa); box-shadow:0 6px 22px rgba(34,211,238,.35);">07</span>
+      <h2 style="margin:0; font-size:21px; font-weight:800; color:#f2f6ff; letter-spacing:.5px;">写在最后：把"能不能做"变成"已经跑起来"</h2>
+    </div>
+    <p style="margin:0 0 16px;">
+      从头到尾，这个项目走完了一条完整的链路：<strong style="color:#67e8f9;">数据获取与融合 → 模型训练与评估 → ONNX 导出 → 网页部署 → 性能剖析</strong>。代码、脚本、演示页全部开源，数据集也按原许可证（CC BY 4.0）标注清楚。
+    </p>
+    <p style="margin:0 0 18px;">
+      我越来越觉得，AI 项目最难的从来不是模型本身，而是把它从一个 mAP 数字，变成一个别人能点开、能上传照片、能亲眼看到结果的网页——再较真一点，去追问那 464ms 到底花在哪了。
+    </p>
+    <div style="padding:22px; border-radius:14px; text-align:center; margin:22px 0;
+      background:radial-gradient(400px 160px at 50% 0%,rgba(34,211,238,.16),transparent),linear-gradient(160deg,#101a30,#0c1120);
+      border:1px solid rgba(34,211,238,.3);">
+      <div style="font-size:17px; font-weight:800; line-height:1.8;
+        background:linear-gradient(90deg,#22d3ee,#a78bfa); -webkit-background-clip:text; background-clip:text; color:#a78bfa;">
+        技术的意义，是把"能不能做"<br>一步步变成"已经跑起来了"。
+      </div>
+    </div>
+    <p style="margin:0 0 8px; font-size:13.5px; color:#a8b8d0;">
+      仓库：<span style="color:#7dd3fc; word-break:break-all;">github.com/shenyicong/elevator-ebike-detection</span>
+    </p>
+    <p style="margin:0 0 20px; font-size:13.5px; color:#a8b8d0;">
+      演示：<span style="color:#6ee7b7; word-break:break-all;">shenyicong.github.io/elevator-ebike-detection</span>
+    </p>
+    <p style="margin:0; color:#9fb0cc;">
+      如果这篇文章对你有帮助，欢迎点个「在看」。下一篇，聊聊怎么用 WebGPU 把 2fps 拉到接近 100fps——那才是这个故事真正的结尾。
+    </p>
+  </section>
+
+  <div style="text-align:center; margin-top:34px; color:#3f5170; font-size:12px; letter-spacing:3px;">· END ·</div>
+
+</div>
+</div>
+</body>
+</html>
