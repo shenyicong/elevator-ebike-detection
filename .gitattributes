@@ -1,0 +1,2 @@
+# onnxruntime 运行时（js/mjs/wasm）必须按字节原样提交，禁止换行符转换
+docs/assets/ort/* -text

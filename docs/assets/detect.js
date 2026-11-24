@@ -47,7 +47,15 @@ let currentImage = null;     // 当前图片 Image 对象
 let currentModelKey = "ds3"; // 当前选中的模型（默认最佳：合并集）
 let useWebGpu = false;       // 是否成功启用 WebGPU 加速（用于状态提示）
 let lastInferMs = 0;         // 最近一次推理耗时（毫秒）
-const ORT_CDN = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/";
+
+// onnxruntime 运行时来源：本地文件优先（随仓库一起部署，不依赖境外 CDN），
+// 万一本地文件缺失再依次尝试公共 CDN。jsdelivr 在国内常被墙，已放到最后。
+const ORT_SOURCES = [
+  "assets/ort/",                                              // ① 本地（最稳）
+  "https://unpkg.com/onnxruntime-web@1.19.2/dist/",           // ② unpkg 兜底
+  "https://cdnjs.cloudflare.com/ajax/libs/onnxruntime-web/1.19.2/", // ③ cdnjs 兜底
+];
+let ortBase = ORT_SOURCES[0]; // 实际生效的来源，wasm 文件也从这里取
 function classNames() { return MODELS[currentModelKey].names; }
 
 /**
@@ -56,7 +64,7 @@ function classNames() { return MODELS[currentModelKey].names; }
  * - 不支持则加载 ort.min.js（CPU WASM，慢但通用）
  * wasmPaths 在两种情况下都指向 CDN 目录，WebGPU 会自动加载 .jsep.wasm。
  */
-async function loadOrt() {
+async function loadOrt(onProgress) {
   if (window.ort) { ortReady = true; return; }
   // 真正探测 GPU adapter：有些浏览器有 navigator.gpu 但拿不到适配器
   let hasWebGpu = false;
@@ -67,41 +75,62 @@ async function loadOrt() {
   } catch (e) {
     hasWebGpu = false; // 非安全上下文（file://）会抛错
   }
-  try {
-    if (hasWebGpu) {
-      await loadScript(ORT_CDN + "ort.webgpu.min.js");
-      useWebGpu = true;
-    } else {
-      await loadScript(ORT_CDN + "ort.min.js");
+  const file = hasWebGpu ? "ort.webgpu.min.js" : "ort.min.js";
+
+  // 依次尝试每个来源，任一成功即用；单个来源 8 秒超时，避免卡死
+  let lastErr = null;
+  for (const base of ORT_SOURCES) {
+    try {
+      if (onProgress) onProgress(`⏳ 正在加载检测引擎（${base.startsWith("assets") ? "本地" : "备用源"}）…`);
+      await loadScript(base + file, 8000);
+      ortBase = base;                    // 记住成功的来源，wasm 从同一处取
+      useWebGpu = hasWebGpu;
+      break;
+    } catch (err) {
+      lastErr = err;
+      console.warn(`运行时来源 ${base} 加载失败：`, err);
+      // WebGPU 版失败也可能只是该源没这个文件，下一轮统一再试
     }
-  } catch (err) {
-    // WebGPU 脚本加载失败则回退普通 WASM 版
-    console.warn("WebGPU 运行时加载失败，回退 WASM：", err);
-    useWebGpu = false;
-    await loadScript(ORT_CDN + "ort.min.js");
   }
-  window.ort.env.wasm.wasmPaths = ORT_CDN;
+  if (!window.ort) {
+    throw new Error("检测引擎加载失败：本地文件与备用 CDN 均不可用，请检查部署或网络");
+  }
+  // wasm / .mjs 必须与 js 同源；且要转成绝对 URL——
+  // onnxruntime 内部用 import() 加载 .mjs，相对路径（如 assets/ort/）会报
+  // "Failed to resolve module specifier"，必须给完整地址。CDN 源本身已是绝对地址。
+  window.ort.env.wasm.wasmPaths = new URL(ortBase, window.location.href).href;
   ortReady = true;
 }
 
-function loadScript(src) {
+/** 带超时的 script 加载：超时后移除节点，交给下一个来源重试 */
+function loadScript(src, timeoutMs = 8000) {
   return new Promise((resolve, reject) => {
     const s = document.createElement("script");
-    s.src = src; s.onload = resolve; s.onerror = () => reject(new Error("加载 onnxruntime 失败，请检查网络"));
+    let settled = false;
+    const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      s.remove();
+      reject(new Error("加载超时：" + src));
+    }, timeoutMs);
+    s.src = src;
+    s.onload = () => { if (settled) return; settled = true; clearTimeout(timer); resolve(); };
+    s.onerror = () => { if (settled) return; settled = true; clearTimeout(timer); s.remove(); reject(new Error("加载失败：" + src)); };
     document.head.appendChild(s);
   });
 }
 
 // ============ 加载 YOLO 模型 ============
-async function loadModel(key) {
+async function loadModel(key, onProgress) {
   key = key || currentModelKey;
   if (sessions[key]) { session = sessions[key]; return session; }
-  await loadOrt();
+  await loadOrt(onProgress);
   const opt = {
     executionProviders: useWebGpu ? ["webgpu"] : ["wasm"],
     graphOptimizationLevel: "all",
   };
   try {
+    if (onProgress) onProgress(`⏳ 正在加载模型（约 10MB，首次需十几秒）…`);
     session = await window.ort.InferenceSession.create(MODELS[key].path, opt);
   } catch (err) {
     // WebGPU 创建会话失败（算子不支持/驱动问题）→ 自动降级 WASM
@@ -254,9 +283,9 @@ function drawBoxes(canvas, img, boxes) {
 async function detect(img) {
   const status = document.getElementById("detect-status");
   status.className = "detect-status loading";
-  status.textContent = "⏳ 正在加载模型（首次约需十几秒）…";
+  status.textContent = "⏳ 正在初始化…";
   try {
-    await loadModel();
+    await loadModel(currentModelKey, (msg) => { status.textContent = msg; });
     status.textContent = "🔍 正在推理检测…";
     await new Promise((r) => setTimeout(r, 30)); // 让状态文字刷新
 
@@ -350,7 +379,7 @@ function initUploader() {
       const status = document.getElementById("detect-status");
       status.className = "detect-status loading";
       status.textContent = `⏳ 正在加载 ${MODELS[currentModelKey].label} …`;
-      try { await loadModel(currentModelKey); } catch (err) { console.error(err); }
+      try { await loadModel(currentModelKey, (msg) => { status.textContent = msg; }); } catch (err) { console.error(err); }
       if (currentImage) { detect(currentImage); }
       else { status.className = "detect-status"; status.textContent = "模型已切换，等待上传图片…"; }
     });
