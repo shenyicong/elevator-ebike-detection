@@ -45,15 +45,42 @@ let sessions = {};           // 按模型 key 缓存会话，切换时不重复�
 let ortReady = false;        // onnxruntime 库是否已就绪
 let currentImage = null;     // 当前图片 Image 对象
 let currentModelKey = "ds3"; // 当前选中的模型（默认最佳：合并集）
+let useWebGpu = false;       // 是否成功启用 WebGPU 加速（用于状态提示）
+let lastInferMs = 0;         // 最近一次推理耗时（毫秒）
+const ORT_CDN = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/";
 function classNames() { return MODELS[currentModelKey].names; }
 
-// ============ 加载 onnxruntime-web（从 CDN）============
+/**
+ * 加载 onnxruntime-web：
+ * - 支持 WebGPU 的浏览器加载 ort.webgpu.min.js（走核显，快几十倍）
+ * - 不支持则加载 ort.min.js（CPU WASM，慢但通用）
+ * wasmPaths 在两种情况下都指向 CDN 目录，WebGPU 会自动加载 .jsep.wasm。
+ */
 async function loadOrt() {
   if (window.ort) { ortReady = true; return; }
-  await loadScript("https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/ort.min.js");
-  // wasm 文件也从 CDN 加载（浏览器端需要）
-  window.ort.env.wasm.wasmPaths =
-    "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/";
+  // 真正探测 GPU adapter：有些浏览器有 navigator.gpu 但拿不到适配器
+  let hasWebGpu = false;
+  try {
+    if (navigator.gpu) {
+      hasWebGpu = !!(await navigator.gpu.requestAdapter());
+    }
+  } catch (e) {
+    hasWebGpu = false; // 非安全上下文（file://）会抛错
+  }
+  try {
+    if (hasWebGpu) {
+      await loadScript(ORT_CDN + "ort.webgpu.min.js");
+      useWebGpu = true;
+    } else {
+      await loadScript(ORT_CDN + "ort.min.js");
+    }
+  } catch (err) {
+    // WebGPU 脚本加载失败则回退普通 WASM 版
+    console.warn("WebGPU 运行时加载失败，回退 WASM：", err);
+    useWebGpu = false;
+    await loadScript(ORT_CDN + "ort.min.js");
+  }
+  window.ort.env.wasm.wasmPaths = ORT_CDN;
   ortReady = true;
 }
 
@@ -71,10 +98,23 @@ async function loadModel(key) {
   if (sessions[key]) { session = sessions[key]; return session; }
   await loadOrt();
   const opt = {
-    executionProviders: ["wasm"],  // 浏览器里用 CPU(wasm) 推理
+    executionProviders: useWebGpu ? ["webgpu"] : ["wasm"],
     graphOptimizationLevel: "all",
   };
-  session = await window.ort.InferenceSession.create(MODELS[key].path, opt);
+  try {
+    session = await window.ort.InferenceSession.create(MODELS[key].path, opt);
+  } catch (err) {
+    // WebGPU 创建会话失败（算子不支持/驱动问题）→ 自动降级 WASM
+    if (useWebGpu) {
+      console.warn("WebGPU 会话创建失败，自动降级 WASM：", err);
+      useWebGpu = false;
+      session = await window.ort.InferenceSession.create(MODELS[key].path, {
+        executionProviders: ["wasm"], graphOptimizationLevel: "all",
+      });
+    } else {
+      throw err;
+    }
+  }
   sessions[key] = session;
   return session;
 }
@@ -224,7 +264,23 @@ async function detect(img) {
     const feeds = {};
     const inputName = session.inputNames[0];
     feeds[inputName] = new window.ort.Tensor("float32", meta.data, [1, 3, IMG_SIZE, IMG_SIZE]);
-    const results = await session.run(feeds);
+    const t0 = performance.now();
+    let results;
+    try {
+      results = await session.run(feeds);
+    } catch (err) {
+      // WebGPU 推理期失败 → 降级 WASM 会话后重试一次
+      if (useWebGpu) {
+        console.warn("WebGPU 推理失败，降级 WASM 重试：", err);
+        useWebGpu = false;
+        sessions = {}; // 清掉所有 WebGPU 会话，避免切换模型时又拿到旧的
+        await loadModel(currentModelKey);
+        results = await session.run(feeds);
+      } else {
+        throw err;
+      }
+    }
+    lastInferMs = performance.now() - t0;
     const output = results[session.outputNames[0]];
     const boxes = postprocess(output, meta);
 
@@ -235,7 +291,8 @@ async function detect(img) {
     document.getElementById("detect-placeholder").style.display = "none";
 
     status.className = "detect-status ok";
-    status.textContent = `✅ 检测完成，发现 ${boxes.length} 个目标`;
+    const backend = useWebGpu ? "⚡ WebGPU 核显加速" : "CPU 兼容模式";
+    status.textContent = `✅ 检测完成，发现 ${boxes.length} 个目标 · ${backend} · ${lastInferMs.toFixed(0)} ms`;
     renderResultList(boxes);
   } catch (err) {
     console.error(err);
