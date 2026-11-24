@@ -397,4 +397,9 @@ function handleFile(file) {
   reader.readAsDataURL(file);
 }
 
-document.addEventListener("DOMContentLoaded", initUploader);
+document.addEventListener("DOMContentLoaded", () => {
+  initUploader();
+  // 后台预热默认模型：页面一打开就悄悄下载引擎+权重并建好会话，
+  // 用户点检测时通常已就绪，避免首次等待十几秒。失败也不影响正常使用。
+  setTimeout(() => { loadModel(currentModelKey).catch((e) => console.warn("后台预热失败：", e)); }, 300);
+});
